@@ -7,26 +7,37 @@ const prisma = new PrismaClient();
 
 export const createWorkReport = async (userId: string, data: any) => {
   const validatedData = createWorkReportSchema.parse(data);
-  
+
+  const projectLogItems = await Promise.all(validatedData.projectLogItems.map(async (item) => {
+    const project = await prisma.project.findUnique({ where: { id: item.projectId } });
+    if (!project) {
+      throw new Error(`Project with id ${item.projectId} not found`);
+    }
+    return {
+      ...item,
+      projectName: project.name,
+    };
+  }));
+
   const dailyWorkReport = await prisma.dailyWorkReport.upsert({
     where: {
       userId_date: {
         userId,
-        date: validatedData.date,
+        date: new Date(validatedData.date),
       },
     },
     create: {
       userId,
-      date: validatedData.date,
+      date: new Date(validatedData.date),
       submittedAt: new Date(),
       projectLogItems: {
-        create: validatedData.projectLogItems,
+        create: projectLogItems,
       },
     },
     update: {
       projectLogItems: {
         deleteMany: {},
-        create: validatedData.projectLogItems,
+        create: projectLogItems,
       },
     },
   });
@@ -36,6 +47,17 @@ export const createWorkReport = async (userId: string, data: any) => {
 
 export const updateWorkReport = async (userId: string, reportId: string, data: any) => {
   const validatedData = updateWorkReportSchema.parse(data);
+
+  const projectLogItems = await Promise.all(validatedData.projectLogItems.map(async (item) => {
+    const project = await prisma.project.findUnique({ where: { id: item.projectId } });
+    if (!project) {
+      throw new Error(`Project with id ${item.projectId} not found`);
+    }
+    return {
+      ...item,
+      projectName: project.name,
+    };
+  }));
 
   const existingReport = await prisma.dailyWorkReport.findUnique({
     where: { id: reportId },
@@ -50,10 +72,31 @@ export const updateWorkReport = async (userId: string, reportId: string, data: a
     data: {
       projectLogItems: {
         deleteMany: {},
-        create: validatedData.projectLogItems,
+        create: projectLogItems,
       },
     },
   });
 
   return updatedReport;
+};
+
+export const getReport = async (reportId: string) => {
+    return await prisma.dailyWorkReport.findUnique({
+        where: { id: reportId },
+        include: { projectLogItems: true },
+    });
+}
+
+export const deleteReport = async (reportId: string) => {
+    return await prisma.dailyWorkReport.delete({
+        where: { id: reportId },
+    });
+}
+
+export const getReportsByUser = async (userId: string) => {
+    return await prisma.dailyWorkReport.findMany({
+        where: { userId },
+        include: { projectLogItems: true },
+        orderBy: { date: 'desc' },
+    });
 };

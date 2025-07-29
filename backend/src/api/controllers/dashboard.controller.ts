@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
-import { prisma } from '../../config'; // Assuming prisma is initialized in the config file
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export const getDashboardData = async (req: Request, res: Response) => {
   try {
@@ -7,7 +9,7 @@ export const getDashboardData = async (req: Request, res: Response) => {
     const attendanceCount = await prisma.attendanceRecord.count({
       where: {
         date: new Date(),
-        clockInTime: { not: null },
+        clockInTime: { not: undefined },
       },
     });
     const billingCount = await prisma.billingRecord.count();

@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-import { InternalMessage } from '../validators/message.validators';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const createMessage = async (messageData: InternalMessage) => {
+export const createMessage = async (messageData: Prisma.InternalMessageUncheckedCreateInput) => {
   return await prisma.internalMessage.create({
     data: messageData,
   });

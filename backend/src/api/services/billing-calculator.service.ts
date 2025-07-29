@@ -1,15 +1,17 @@
-import { PrismaClient } from '@prisma/client';
-import { EmployeePeriodBillingSummary } from '../models/EmployeePeriodBillingSummary'; // Assuming this model exists
-import { DailyWorkReport, LeaveRequest, AttendanceRecord } from '../models'; // Adjust imports as necessary
+import { PrismaClient, DailyWorkReport, LeaveRequest, AttendanceRecord } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const calculateBillingPeriod = async (startDate: Date, endDate: Date) => {
-  const users = await prisma.user.findMany();
-  const countBasedProjects = await prisma.project.findMany({
-    where: { billingType: 'count_based' },
-  });
+// This is a placeholder type. You should define this based on your actual data model.
+export interface EmployeePeriodBillingSummary {
+  userId: string;
+  userName: string;
+  // Add other fields as necessary
+  details?: any[]; // Optional details
+}
 
+export const calculateBillingPeriod = async (startDate: Date, endDate: Date): Promise<EmployeePeriodBillingSummary[]> => {
+  const users = await prisma.user.findMany();
   const summaries: EmployeePeriodBillingSummary[] = [];
 
   for (const user of users) {
@@ -20,7 +22,6 @@ export const calculateBillingPeriod = async (startDate: Date, endDate: Date) => 
           gte: startDate,
           lte: endDate,
         },
-        // Include related ProjectLogItems if needed
       },
       include: {
         projectLogItems: true,
@@ -51,7 +52,7 @@ export const calculateBillingPeriod = async (startDate: Date, endDate: Date) => 
     });
 
     // Perform calculations based on the fetched data
-    const summary = {
+    const summary: EmployeePeriodBillingSummary = {
       userId: user.id,
       userName: `${user.firstName} ${user.lastName}`,
       // Add more fields as necessary
@@ -63,32 +64,37 @@ export const calculateBillingPeriod = async (startDate: Date, endDate: Date) => 
   return summaries;
 };
 
-export const finalizeBilling = async (summaryData: EmployeePeriodBillingSummary[]) => {
-  await prisma.$transaction(async (prisma) => {
-    for (const summary of summaryData) {
-      const billingRecord = await prisma.billingRecord.create({
-        data: {
-          userId: summary.userId,
-          // Add other necessary fields
-        },
-      });
+export const finalizeBilling = async (userIds: string[], startDate: Date, endDate: Date) => {
+  const summaryData = await calculateBillingPeriod(startDate, endDate);
+  const filteredSummary = summaryData.filter(s => userIds.includes(s.userId));
 
-      // If using separate table for details
-      await prisma.billingRecordDetail.createMany({
-        data: summary.details.map(detail => ({
-          billingRecordId: billingRecord.id,
-          // Map other fields from detail
-        })),
-      });
+  const operations = filteredSummary.flatMap(summary => {
+    const billingRecordPromise = prisma.billingRecord.create({
+      data: {
+        userId: summary.userId,
+        projectId: "default-project-id", // Placeholder
+        projectName: "Default Project", // Placeholder
+        clientName: "Default Client", // Placeholder
+        calculatedAmount: 0, // Replace with actual calculation
+        date: endDate,
+        status: 'FINALIZED',
+        billingPeriodStartDate: startDate,
+        billingPeriodEndDate: endDate,
+        isCountBased: false,
+      },
+    });
 
-      // Create an internal message for the user
-      await prisma.internalMessage.create({
-        data: {
-          recipientId: summary.userId,
-          content: `Your billing for the period has been finalized.`,
-          // Add other necessary fields
-        },
-      });
-    }
+    const messagePromise = prisma.internalMessage.create({
+      data: {
+        recipientId: summary.userId,
+        content: `Your billing for the period ${startDate.toDateString()} - ${endDate.toDateString()} has been finalized.`,
+        senderId: 'system', // Or the admin user's ID
+        senderName: 'System',
+        timestamp: new Date(),
+      },
+    });
+    return [billingRecordPromise, messagePromise];
   });
+
+  return prisma.$transaction(operations);
 };

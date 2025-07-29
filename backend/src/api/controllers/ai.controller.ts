@@ -12,6 +12,6 @@ export const generateContent = async (req: Request, res: Response) => {
     const result = await generate(prompt);
     res.json(result);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: (error as Error).message });
   }
 };

@@ -2,43 +2,69 @@ import { Request, Response } from 'express';
 import { Project } from '@prisma/client';
 import * as projectService from '../services/project.service';
 import * as projectValidators from '../validators/project.validators';
-import { validate } from '../middleware/validation.middleware';
+import { z } from 'zod';
 
 export const createProject = async (req: Request, res: Response) => {
-    const validatedData = await validate(projectValidators.createProjectSchema, req.body);
-    const newProject: Project = await projectService.createProject(validatedData);
-    res.status(201).json(newProject);
+    try {
+        const validatedData = projectValidators.createProjectSchema.parse(req.body);
+        const newProject: Project = await projectService.createProject(validatedData);
+        res.status(201).json(newProject);
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ errors: error.errors });
+        }
+        res.status(500).json({ message: 'Error creating project' });
+    }
 };
 
 export const getAllProjects = async (req: Request, res: Response) => {
-    const projects = await projectService.getAllProjects();
-    res.status(200).json(projects);
+    try {
+        const projects = await projectService.getAllProjects();
+        res.status(200).json(projects);
+    } catch (error) {
+        res.status(500).json({ message: 'Error getting projects' });
+    }
 };
 
 export const getProjectById = async (req: Request, res: Response) => {
     const projectId = req.params.projectId;
-    const project = await projectService.getProjectById(projectId);
-    if (!project) {
-        return res.status(404).json({ message: 'Project not found' });
+    try {
+        const project = await projectService.getProjectById(projectId);
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+        res.status(200).json(project);
+    } catch (error) {
+        res.status(500).json({ message: 'Error getting project' });
     }
-    res.status(200).json(project);
 };
 
 export const updateProject = async (req: Request, res: Response) => {
     const projectId = req.params.projectId;
-    const validatedData = await validate(projectValidators.updateProjectSchema, req.body);
-    const updatedProject = await projectService.updateProject(projectId, validatedData);
-    if (!updatedProject) {
-        return res.status(404).json({ message: 'Project not found' });
+    try {
+        const validatedData = projectValidators.updateProjectSchema.parse(req.body);
+        const updatedProject = await projectService.updateProject(projectId, validatedData);
+        if (!updatedProject) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+        res.status(200).json(updatedProject);
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ errors: error.errors });
+        }
+        res.status(500).json({ message: 'Error updating project' });
     }
-    res.status(200).json(updatedProject);
 };
 
 export const deleteProject = async (req: Request, res: Response) => {
     const projectId = req.params.projectId;
-    const deleted = await projectService.deleteProject(projectId);
-    if (!deleted) {
-        return res.status(404).json({ message: 'Project not found' });
+    try {
+        const deleted = await projectService.deleteProject(projectId);
+        if (!deleted) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting project' });
     }
-    res.status(204).send();
 };

@@ -1,12 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-import { BillingRecord, BillingRecordDetail } from '@prisma/client';
-import { InternalMessage } from '@prisma/client';
-import { User } from '@prisma/client';
-import { Project } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const createBillingRecord = async (data: BillingRecord) => {
+export const createBillingRecord = async (data: Prisma.BillingRecordUncheckedCreateInput) => {
     return await prisma.billingRecord.create({
         data,
     });
@@ -18,7 +14,7 @@ export const getBillingRecords = async (userId: string) => {
     });
 };
 
-export const updateBillingRecord = async (id: string, data: Partial<BillingRecord>) => {
+export const updateBillingRecord = async (id: string, data: Prisma.BillingRecordUpdateInput) => {
     return await prisma.billingRecord.update({
         where: { id },
         data,
@@ -31,7 +27,7 @@ export const deleteBillingRecord = async (id: string) => {
     });
 };
 
-export const createBillingRecordDetail = async (data: BillingRecordDetail) => {
+export const createBillingRecordDetail = async (data: Prisma.BillingRecordDetailUncheckedCreateInput) => {
     return await prisma.billingRecordDetail.create({
         data,
     });
@@ -41,37 +37,4 @@ export const getBillingRecordDetails = async (billingRecordId: string) => {
     return await prisma.billingRecordDetail.findMany({
         where: { billingRecordId },
     });
-};
-
-export const finalizeBillingPeriod = async (billingData: any) => {
-    const { userId, projectId, ...rest } = billingData;
-
-    const billingRecord = await createBillingRecord({
-        userId,
-        projectId,
-        ...rest,
-    });
-
-    // Create details if needed
-    if (billingData.details) {
-        await Promise.all(
-            billingData.details.map((detail: any) => createBillingRecordDetail({
-                billingRecordId: billingRecord.id,
-                ...detail,
-            }))
-        );
-    }
-
-    // Send internal message to user
-    await prisma.internalMessage.create({
-        data: {
-            senderId: null, // SYSTEM
-            senderName: 'SYSTEM',
-            recipientId: userId,
-            content: `Your billing record for project ${projectId} has been finalized.`,
-            timestamp: new Date(),
-        },
-    });
-
-    return billingRecord;
 };

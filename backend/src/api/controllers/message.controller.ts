@@ -23,10 +23,12 @@ export const sendMessage = async (req: Request, res: Response) => {
   const { recipientId, content } = result.data;
 
   try {
-    const newMessage = await messageService.sendMessage({
+    const newMessage = await messageService.createMessage({
       senderId: req.user.id,
+      senderName: `${req.user.firstName} ${req.user.lastName}`,
       recipientId,
       content,
+      timestamp: new Date(),
     });
     res.status(201).json(newMessage);
   } catch (error) {
