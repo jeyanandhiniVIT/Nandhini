@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { LeaveRequest } from '@prisma/client';
+import type { LeaveRequest } from '@prisma/client';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
@@ -15,15 +15,21 @@ const leaveRequestSchema = z.object({
 
 // Service to handle leave request operations
 class LeaveRequestService {
-  async createLeaveRequest(data: LeaveRequest) {
-    const validatedData = leaveRequestSchema.parse(data);
+  async createLeaveRequest(data: z.infer<typeof leaveRequestSchema>) {
+    const user = await prisma.user.findUnique({ where: { id: data.userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
     return await prisma.leaveRequest.create({
       data: {
-        userId: validatedData.userId,
-        leaveType: validatedData.leaveType,
-        startDate: validatedData.startDate,
-        endDate: validatedData.endDate,
-        reason: validatedData.reason,
+        userId: data.userId,
+        userFirstName: user.firstName,
+        userLastName: user.lastName,
+        leaveType: data.leaveType,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        reason: data.reason,
         status: 'PENDING',
         requestedAt: new Date(),
       },

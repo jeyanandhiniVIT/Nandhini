@@ -1,4 +1,5 @@
-import { PrismaClient, DailyWorkReport, LeaveRequest, AttendanceRecord } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import type { DailyWorkReport, LeaveRequest, AttendanceRecord } from '@prisma/client';
 
 const prisma = new PrismaClient();
 

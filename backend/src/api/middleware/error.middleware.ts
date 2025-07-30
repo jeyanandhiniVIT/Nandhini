@@ -1,15 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
+import { AppError } from '../../utils/errorHandler';
 
-const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-    console.error(err); // Log the error for debugging
+const errorHandler = (err: AppError, req: Request, res: Response, next: NextFunction) => {
+    err.statusCode = err.statusCode || 500;
+    err.status = err.status || 'error';
 
-    const statusCode = err.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
-
-    res.status(statusCode).json({
-        status: 'error',
-        statusCode,
-        message,
+    res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
     });
 };
 

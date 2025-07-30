@@ -1,5 +1,7 @@
-import { prisma } from '../../config'; // Import Prisma client instance
-import { User } from '@prisma/client'; // Import User model type
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+import type { User } from '@prisma/client'; // Import User model type
 
 export const getDashboardData = async () => {
   const totalUsers = await prisma.user.count();
@@ -11,7 +13,7 @@ export const getDashboardData = async () => {
     where: {
       date: today,
       clockInTime: {
-        not: null,
+        not: undefined,
       },
     },
   });

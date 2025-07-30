@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-import { AppError } from '../utils/errorHandler'; // Assuming you have a custom error handler
+import { AppError } from '../../utils/errorHandler';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // Replace with your actual secret
 

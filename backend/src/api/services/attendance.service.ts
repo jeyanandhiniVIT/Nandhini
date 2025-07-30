@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { AttendanceRecord } from '@prisma/client';
+import type { AttendanceRecord } from '@prisma/client';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
@@ -11,7 +11,7 @@ const attendanceSchema = z.object({
   clockInTime: z.string().refine((time) => !isNaN(Date.parse(time)), {
     message: "Invalid clock-in time format",
   }),
-  clockOutTime: z.string().optional().refine((time) => !isNaN(Date.parse(time)), {
+  clockOutTime: z.string().optional().refine((time) => (time ? !isNaN(Date.parse(time)) : true), {
     message: "Invalid clock-out time format",
   }),
   notes: z.string().optional(),

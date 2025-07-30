@@ -15,6 +15,7 @@ import messageRoutes from './api/routes/message.routes';
 import aiRoutes from './api/routes/ai.routes';
 import errorMiddleware from './api/middleware/error.middleware';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
 
 dotenv.config();
 
@@ -23,6 +24,8 @@ const prisma = new PrismaClient();
 
 app.use(cors());
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, '../../dist')));
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

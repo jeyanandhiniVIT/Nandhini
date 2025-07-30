@@ -1,17 +1,23 @@
 import { PrismaClient } from '@prisma/client';
 import { User } from '@prisma/client';
 import { hash } from 'bcrypt';
-import { UserCreateInput, UserUpdateInput } from '../validators/user.validators';
+import { createUserSchema, updateUserSchema } from '../validators/user.validators';
+import { z } from 'zod';
+
+type UserCreateInput = z.infer<typeof createUserSchema>;
+type UserUpdateInput = z.infer<typeof updateUserSchema>;
 
 const prisma = new PrismaClient();
 
 export const userService = {
   createUser: async (data: UserCreateInput): Promise<User> => {
-    const passwordHash = await hash(data.password, 10);
+    const { password, joinDate, ...rest } = data;
+    const passwordHash = await hash(password, 10);
     return await prisma.user.create({
       data: {
-        ...data,
+        ...rest,
         passwordHash,
+        joinDate: joinDate ? new Date(joinDate) : new Date(),
       },
     });
   },
@@ -23,9 +29,13 @@ export const userService = {
   },
 
   updateUser: async (id: string, data: UserUpdateInput): Promise<User> => {
+    const { joinDate, ...rest } = data;
     return await prisma.user.update({
       where: { id },
-      data,
+      data: {
+        ...rest,
+        joinDate: joinDate ? new Date(joinDate) : new Date(),
+      },
     });
   },
 

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { LeaveRequest } from '@prisma/client';
+import type { LeaveRequest } from '@prisma/client';
 import { leaveRequestService } from '../services/leave-request.service';
 import { z } from 'zod';
 

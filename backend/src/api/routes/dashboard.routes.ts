@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { authenticateJWT } from '../middleware/auth.middleware';
-import { dashboardController } from '../controllers/dashboard.controller';
+import { authenticateJWT, authorizeAdmin } from '../middleware/auth.middleware';
+import { getDashboardData } from '../controllers/dashboard.controller';
 
 const router = Router();
 
 // Dashboard data aggregation routes
-router.get('/admin', authenticateJWT, dashboardController.getAdminDashboardData);
-router.get('/employee/:userId', authenticateJWT, dashboardController.getEmployeeDashboardData);
+router.get('/admin', authenticateJWT, authorizeAdmin, getDashboardData);
+// Assuming getDashboardData provides data for admin dashboard. Employee dashboard might need a separate controller function or adjustment.
 
 export default router;

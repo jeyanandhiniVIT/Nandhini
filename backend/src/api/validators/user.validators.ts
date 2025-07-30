@@ -9,7 +9,9 @@ export const createUserSchema = z.object({
   profilePictureUrl: z.string().optional(),
   phone: z.string().optional(),
   department: z.string().optional(),
-  joinDate: z.string().optional(), // ISO date string
+  joinDate: z.preprocess((arg) => {
+    if (typeof arg == "string" || arg instanceof Date) return new Date(arg);
+  }, z.date()).optional(),
 });
 
 export const updateUserSchema = z.object({
@@ -21,7 +23,9 @@ export const updateUserSchema = z.object({
   profilePictureUrl: z.string().optional(),
   phone: z.string().optional(),
   department: z.string().optional(),
-  joinDate: z.string().optional(), // ISO date string
+  joinDate: z.preprocess((arg) => {
+    if (typeof arg == "string" || arg instanceof Date) return new Date(arg);
+  }, z.date()).optional(),
 });
 
 export const changePasswordSchema = z.object({

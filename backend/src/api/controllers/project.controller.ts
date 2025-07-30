@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Project } from '@prisma/client';
+import type { Project, Prisma } from '@prisma/client';
 import * as projectService from '../services/project.service';
 import * as projectValidators from '../validators/project.validators';
 import { z } from 'zod';
@@ -7,7 +7,7 @@ import { z } from 'zod';
 export const createProject = async (req: Request, res: Response) => {
     try {
         const validatedData = projectValidators.createProjectSchema.parse(req.body);
-        const newProject: Project = await projectService.createProject(validatedData);
+        const newProject: Project = await projectService.createProject(validatedData as Prisma.ProjectCreateInput);
         res.status(201).json(newProject);
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -43,7 +43,7 @@ export const updateProject = async (req: Request, res: Response) => {
     const projectId = req.params.projectId;
     try {
         const validatedData = projectValidators.updateProjectSchema.parse(req.body);
-        const updatedProject = await projectService.updateProject(projectId, validatedData);
+        const updatedProject = await projectService.updateProject(projectId, validatedData as Prisma.ProjectUpdateInput);
         if (!updatedProject) {
             return res.status(404).json({ message: 'Project not found' });
         }

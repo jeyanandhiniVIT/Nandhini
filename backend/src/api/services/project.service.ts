@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import { Project } from '../validators/project.validators';
+import type { Project, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const createProject = async (data: Project) => {
+export const createProject = async (data: Prisma.ProjectCreateInput) => {
   return await prisma.project.create({
     data,
   });
@@ -15,7 +15,7 @@ export const getProjectById = async (id: string) => {
   });
 };
 
-export const updateProject = async (id: string, data: Project) => {
+export const updateProject = async (id: string, data: Prisma.ProjectUpdateInput) => {
   return await prisma.project.update({
     where: { id },
     data,
