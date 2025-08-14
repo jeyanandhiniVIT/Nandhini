@@ -4,8 +4,7 @@ import { fetchAdminDashboardData } from '../../services/api';
 import { AdminDashboardData } from '../../types';
 import { THEME, POSITIVE_MESSAGES } from '../../constants';
 import { useAuth } from '../../hooks/useAuth'; 
-import { UsersIcon, UserGroupIcon, BriefcaseIcon, CalendarDaysIcon, UserMinusIcon, UserPlusIcon, CalculatorIcon, PaperAirplaneIcon, DocumentChartBarIcon, ClockIcon as ReportClockIcon, CreditCardIcon } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
+import { UsersIcon, UserGroupIcon, BriefcaseIcon, UserMinusIcon, UserPlusIcon } from '@heroicons/react/24/outline';
 
 
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode; bgColorClass: string; textColorClass: string }> = ({ title, value, icon, bgColorClass, textColorClass }) => (
@@ -120,27 +119,7 @@ const AdminDashboard: React.FC = () => {
         )}
       </div>
 
-       <div className={`mt-8 p-6 bg-white rounded-xl shadow-lg`}>
-        <h3 className={`text-xl font-semibold text-${THEME.accentText} mb-4`}>Quick Links & Reports</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <Link to="/admin/employees" className={`flex items-center justify-center text-center px-4 py-3 bg-${THEME.primary} text-${THEME.primaryText} rounded-md hover:bg-opacity-80 transition`}>
-              <UserGroupIcon className="h-5 w-5 mr-2 hidden sm:inline-block"/> Manage Employees</Link>
-            <Link to="/admin/projects" className={`flex items-center justify-center text-center px-4 py-3 bg-${THEME.primary} text-${THEME.primaryText} rounded-md hover:bg-opacity-80 transition`}>
-              <BriefcaseIcon className="h-5 w-5 mr-2 hidden sm:inline-block"/>Manage Projects</Link>
-            <Link to="/admin/billing" className={`flex items-center justify-center text-center px-4 py-3 bg-${THEME.secondary} text-${THEME.secondaryText} rounded-md hover:bg-opacity-80 transition`}>
-              <CreditCardIcon className="h-5 w-5 mr-2 hidden sm:inline-block"/>Billing Records</Link>
-            <Link to="/admin/billing-calculator" className={`flex items-center justify-center text-center px-4 py-3 bg-${THEME.secondary} text-${THEME.secondaryText} rounded-md hover:bg-opacity-80 transition`}>
-              <CalculatorIcon className="h-5 w-5 mr-2 hidden sm:inline-block"/>Billing Calculator</Link>
-            <Link to="/admin/leave-requests" className={`flex items-center justify-center text-center px-4 py-3 bg-${THEME.secondary} text-${THEME.secondaryText} rounded-md hover:bg-opacity-80 transition`}>
-              <CalendarDaysIcon className="h-5 w-5 mr-2 hidden sm:inline-block"/>Leave Requests</Link>
-            <Link to="/admin/send-notification" className={`flex items-center justify-center text-center px-4 py-3 border border-${THEME.primary} text-${THEME.primary} rounded-md hover:bg-${THEME.accent} transition`}>
-              <PaperAirplaneIcon className="h-5 w-5 mr-2 hidden sm:inline-block"/>Send Message</Link>
-            <Link to="/admin/attendance-reports" className={`flex items-center justify-center text-center px-4 py-3 border border-${THEME.primary} text-${THEME.primary} rounded-md hover:bg-${THEME.accent} transition`}>
-              <ReportClockIcon className="h-5 w-5 mr-2 hidden sm:inline-block"/>Attendance Reports</Link>
-            <Link to="/admin/work-reports" className={`flex items-center justify-center text-center px-4 py-3 border border-${THEME.primary} text-${THEME.primary} rounded-md hover:bg-${THEME.accent} transition`}>
-              <DocumentChartBarIcon className="h-5 w-5 mr-2 hidden sm:inline-block"/>Work Reports</Link>
-        </div>
-      </div>
+  {/* Quick Links & Reports section removed as requested */}
     </div>
   );
 };

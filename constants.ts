@@ -1,5 +1,5 @@
 
-export const APP_NAME = "Employee Management System";
+export const APP_NAME = "Vendhan InfoTech";
 
 // These are descriptive names for colors defined in tailwind.config via index.html
 // Use them like `bg-theme-primary`, `text-theme-accent-text` etc.
@@ -10,6 +10,7 @@ export const THEME = {
   primaryText: 'theme-primary-text',
   secondaryText: 'theme-secondary-text',
   accentText: 'theme-accent-text',
+  logoUrl: '/assets/logo.png',
 };
 
 export const MOCK_API_DELAY = 1000; // ms

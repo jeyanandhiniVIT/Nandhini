@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -8,9 +7,9 @@ import {
     apiFetchProjects,
     apiAddBillingRecord
 } from '../../services/api';
-import { BillingRecord, BillingStatus, User, Project, EmployeeProjectBillingDetail, NewManualBillingRecordData, NewCalculatedBillingRecordData } from '../../types';
+import { BillingRecord, BillingStatus, User, Project } from '../../types';
 import { THEME } from '../../constants';
-import { PlusCircleIcon, PencilSquareIcon, TrashIcon, EyeIcon, XMarkIcon, ArrowUpTrayIcon, DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { PlusCircleIcon, PencilSquareIcon, TrashIcon, XMarkIcon, ArrowUpTrayIcon, DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { formatDate } from '../../utils/dateUtils';
 import { parseCSVToObjects } from '../../utils/csvParser'; // Ensure this path is correct
 
@@ -275,11 +274,11 @@ const ManageBilling: React.FC = () => {
                 <ArrowUpTrayIcon className="h-5 w-5 mr-2" /> Import CSV
             </button>
             <Link
-            to="/admin/billing/new"
-            className={`${buttonPrimaryClasses} w-full sm:w-auto justify-center`}
+              to="/app/admin/billing/add"
+              className={`${buttonPrimaryClasses} w-full sm:w-auto justify-center`}
             >
-            <PlusCircleIcon className="h-5 w-5 mr-2" />
-            Add New Record
+              <PlusCircleIcon className="h-5 w-5 mr-2" />
+              Add New Record
             </Link>
         </div>
       </div>

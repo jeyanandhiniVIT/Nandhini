@@ -16,6 +16,7 @@ import aiRoutes from './api/routes/ai.routes';
 import errorMiddleware from './api/middleware/error.middleware';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import logoRoutes from './api/routes/logo.routes';
 
 dotenv.config();
 
@@ -25,7 +26,7 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, '../../dist')));
+app.use('/assets', express.static(path.join(__dirname, '../../assets')));
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -44,6 +45,7 @@ app.use('/billing-calculator', billingCalculatorRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/messages', messageRoutes);
 app.use('/ai', aiRoutes);
+app.use('/api', logoRoutes);
 
 app.use('/auth/login', authLimiter);
 app.use('/auth/register', authLimiter);

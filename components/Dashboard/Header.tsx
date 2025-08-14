@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { APP_NAME, THEME } from '../../constants';
-import { UserIcon, ArrowRightOnRectangleIcon, Bars3Icon, BellIcon, KeyIcon } from '@heroicons/react/24/outline';
-import { apiGetUnreadMessageCount } from '../../services/api'; 
+import { THEME } from '../../constants';
+import { UserIcon, ArrowRightOnRectangleIcon, Bars3Icon, BellIcon, KeyIcon, PhotoIcon } from '@heroicons/react/24/outline';
+import { apiGetUnreadMessageCount, apiUploadLogo, apiFetchLogo } from '../../services/api';
+import ImageUpload from '../Common/ImageUpload';
 
 
 interface HeaderProps {
@@ -16,6 +17,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuButtonClick }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [logoModalOpen, setLogoModalOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>('/assets/logo.png');
+  const [tempLogo, setTempLogo] = useState<string | null>(null); // Temporary logo state
 
   // Prepend /app to paths
   const appPath = (path: string) => `/app${path}`;
@@ -23,6 +27,37 @@ const Header: React.FC<HeaderProps> = ({ onMenuButtonClick }) => {
   const handleLogout = async () => {
     await logout();
     navigate('/welcome'); // Navigate to welcome page on logout
+  };
+
+  const base64ToBlob = (base64: string) => {
+  const arr = base64.split(',');
+  const mimeMatch = arr[0].match(/:(.*?);/);
+  if (!mimeMatch) throw new Error('Invalid base64 string');
+  const mime = mimeMatch[1];
+  const bstr = atob(arr[1]);
+  const n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
+  return new Blob([u8arr], { type: mime });
+  };
+
+  const handleLogoSave = async (base64: string) => {
+    if (!base64) {
+      alert('No logo selected.');
+      return;
+    }
+    try {
+      const blob = base64ToBlob(base64);
+      const data = await apiUploadLogo(blob);
+      // Prepend a timestamp to the URL to force a reload of the image
+      setLogoUrl(`${data.url}?t=${new Date().getTime()}`);
+      setLogoModalOpen(false);
+      setTempLogo(null);
+      alert('Logo updated successfully!');
+    } catch (err: any) {
+      console.error('Logo upload error:', err);
+      alert(`Failed to save logo: ${err.message || 'Please try again.'}`);
+    }
   };
 
   useEffect(() => {
@@ -60,6 +95,18 @@ const Header: React.FC<HeaderProps> = ({ onMenuButtonClick }) => {
     };
   }, [user]);
 
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const url = await apiFetchLogo();
+        setLogoUrl(`${url}?t=${new Date().getTime()}`);
+      } catch (error) {
+        console.error('Failed to fetch logo:', error);
+      }
+    };
+    fetchLogo();
+  }, []);
+
 
   const UserAvatar: React.FC = () => {
     if (user?.profilePictureUrl) {
@@ -80,7 +127,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuButtonClick }) => {
             >
               <Bars3Icon className="h-6 w-6" />
             </button>
-            <div className={`ml-2 md:ml-0 text-xl font-bold`}>{APP_NAME}</div>
+              <img
+                src="/assets/new-logo.png"
+                alt="Application Logo"
+                className="h-10 w-auto mr-3 rounded shadow"
+              />
           </div>
           
           <div className="flex items-center space-x-4">
@@ -141,9 +192,34 @@ const Header: React.FC<HeaderProps> = ({ onMenuButtonClick }) => {
                 )}
               </div>
             )}
+
+            {/* Change Logo button moved to right menu bar as icon for admin */}
+            {user?.role === 'admin' && (
+              <button
+                className="p-2 rounded-full bg-theme-secondary text-white hover:bg-theme-primary"
+                onClick={() => setLogoModalOpen(true)}
+                title="Change Logo"
+              >
+                <PhotoIcon className="h-6 w-6" />
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Logo upload modal */}
+      {logoModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-xl">
+            <h2 className="text-lg font-bold mb-4">Upload New Logo</h2>
+            <ImageUpload onImageSelected={(base64) => setTempLogo(base64)} />
+            <div className="flex gap-2 mt-4">
+              <button className="px-4 py-2 bg-theme-primary text-white rounded" onClick={() => setLogoModalOpen(false)}>Cancel</button>
+              <button className="px-4 py-2 bg-theme-secondary text-white rounded" onClick={() => tempLogo && handleLogoSave(tempLogo)}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

@@ -73,14 +73,14 @@ const DashboardPage: React.FC = () => {
     if (path === '/admin/employees') {
       return <MainLayout><ManageEmployees /></MainLayout>;
     }
-    if (path === '/admin/register') { // New route for admin to register users
+    if (path === '/admin/register' || path === '/admin/employees/add') { // Support both routes for Add New User
       return <MainLayout><Register /></MainLayout>;
     }
     if (path === '/admin/projects') {
       return <MainLayout><ManageProjects /></MainLayout>;
     }
-    if (path === '/admin/billing/new') {
-       return <MainLayout><BillingForm /></MainLayout>;
+    if (path === '/admin/billing/add') {
+      return <MainLayout><BillingForm /></MainLayout>;
     }
     // Match /admin/billing/edit/:recordId
     const editBillingMatch = path.match(/^\/admin\/billing\/edit\/([^/]+)$/);

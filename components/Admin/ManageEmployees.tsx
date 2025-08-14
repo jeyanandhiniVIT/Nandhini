@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { apiFetchAllUsers, apiAdminUpdateUser, apiAdminResetPassword, apiDeleteUser } from '../../services/api';
-import { User, UserRole, AdminUserUpdateData, ChangePasswordData } from '../../types';
+import { User, UserRole, AdminUserUpdateData } from '../../types';
 import { THEME } from '../../constants';
 import { UserPlusIcon, PencilSquareIcon, TrashIcon, XMarkIcon, UserCircleIcon, KeyIcon } from '@heroicons/react/24/outline';
 import ImageUpload from '../Common/ImageUpload'; 
@@ -241,7 +240,7 @@ const ManageEmployees: React.FC = () => {
             className={`${inputBaseClasses} sm:w-64 w-full`}
         />
         <Link
-          to="/register"
+          to="/app/admin/employees/add"
           className={`inline-flex items-center px-4 py-2 bg-${THEME.primary} text-${THEME.primaryText} text-sm font-medium rounded-md hover:bg-opacity-85 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${THEME.primary} w-full sm:w-auto justify-center`}
         >
           <UserPlusIcon className="h-5 w-5 mr-2" />

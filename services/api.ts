@@ -1,7 +1,7 @@
 
-import { User, UserRole, AdminDashboardData, EmployeeDashboardData, StoredUser, BillingRecord, BillingStatus, NewManualBillingRecordData, NewCalculatedBillingRecordData, Project, DailyWorkReport, NewDailyWorkReportData, ProjectLogItemData, LeaveRequest, LeaveType, LeaveStatus, NewLeaveRequestData, ProjectBillingType, EmployeeProfileUpdateData, AttendanceRecord, UserAttendanceStatus, AdminUserUpdateData, InternalMessage, MessageRecipient, WorkReportFilters, ChangePasswordData, EmployeeProjectBillingDetail, ProjectLogItem } from '../types';
+import { User, UserRole, AdminDashboardData, EmployeeDashboardData, StoredUser, BillingRecord, BillingStatus, Project, DailyWorkReport, NewDailyWorkReportData, LeaveRequest, LeaveStatus, NewLeaveRequestData, EmployeeProfileUpdateData, AttendanceRecord, UserAttendanceStatus, AdminUserUpdateData, InternalMessage, WorkReportFilters, ChangePasswordData, ProjectLogItem } from '../types';
 import { MOCK_API_DELAY } from '../constants';
-import { calculateLeaveDays, calculateDecimalHours, formatDate } from '../utils/dateUtils';
+import { calculateDecimalHours, formatDate } from '../utils/dateUtils';
 
 // =====================================================================================
 // Mock Data Store
@@ -44,7 +44,6 @@ const mockInternalMessages: InternalMessage[] = [];
 // All localStorage-based data persistence has been removed from this file.
 // =====================================================================================
 
-const API_BASE_URL = '/api/v1'; // Example base URL for your backend
 
 // --- User Management Interfaces (kept for consistency with AuthContext) ---
 export interface ParsedLoginCredentials {
@@ -63,7 +62,6 @@ export interface ParsedRegisterData {
 }
 
 // --- Helper to get the auth token ---
-const getAuthToken = (): string | null => localStorage.getItem('authToken');
 
 // --- Helper to convert StoredUser to User ---
 const stripPassword = (storedUser: StoredUser): User => {
@@ -611,4 +609,38 @@ export const apiGetUnreadMessageCount = async (userId: string): Promise<number> 
   return Promise.resolve(
     mockInternalMessages.filter(msg => (msg.recipientId === userId || msg.recipientId === 'ALL_USERS') && !msg.isRead && msg.senderId !== userId).length
   );
+};
+
+export const apiUploadLogo = async (logoBlob: Blob): Promise<{ url: string }> => {
+  const formData = new FormData();
+  formData.append('logo', logoBlob, 'logo.png');
+
+  // This assumes your backend is running on the same origin or you have a proxy setup.
+  // If your frontend and backend are on different ports during development (e.g., Vite on 5173, backend on 3000),
+  // you need to configure a proxy in `vite.config.ts`.
+  const response = await fetch('/api/logo', {
+    method: 'POST',
+    body: formData,
+    // Headers might be needed depending on your backend setup, e.g., for auth tokens.
+    // headers: {
+    //   'Authorization': `Bearer ${getAuthToken()}`,
+    // },
+  });
+
+  if (!response.ok) {
+    // Try to get a meaningful error message from the backend
+    const errorData = await response.json().catch(() => ({ error: 'Failed to upload logo. Please try again.' }));
+    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+};
+
+export const apiFetchLogo = async (): Promise<string> => {
+  const response = await fetch('/api/logo');
+  if (!response.ok) {
+    throw new Error('Failed to fetch logo');
+  }
+  const data = await response.json();
+  return data.url;
 };
