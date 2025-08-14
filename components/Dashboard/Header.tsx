@@ -49,8 +49,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuButtonClick }) => {
     try {
       const blob = base64ToBlob(base64);
       const data = await apiUploadLogo(blob);
-      // Prepend a timestamp to the URL to force a reload of the image
-      setLogoUrl(`${data.url}?t=${new Date().getTime()}`);
+      if (data.url) {
+        // Prepend a timestamp to the URL to force a reload of the image
+        setLogoUrl(`${data.url}?t=${new Date().getTime()}`);
+      }
       setLogoModalOpen(false);
       setTempLogo(null);
       alert('Logo updated successfully!');
@@ -128,7 +130,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuButtonClick }) => {
               <Bars3Icon className="h-6 w-6" />
             </button>
               <img
-                src="/assets/new-logo.png"
+                src={logoUrl}
                 alt="Application Logo"
                 className="h-10 w-auto mr-3 rounded shadow"
               />

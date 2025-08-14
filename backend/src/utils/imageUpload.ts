@@ -21,5 +21,18 @@ const storage = new CloudinaryStorage({
 // Initialize multer with Cloudinary storage
 const upload = multer({ storage: storage });
 
+// Set up local storage for logo
+const logoStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'assets/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, 'logo.png');
+  },
+});
+
+const uploadLogoLocal = multer({ storage: logoStorage });
+
 // Utility function for handling image uploads
 export const uploadImage = upload.single('profilePicture');
+export const uploadLogoFile = uploadLogoLocal.single('logo');

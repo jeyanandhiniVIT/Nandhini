@@ -34,8 +34,9 @@ jobs:
           gcloud services enable cloudbuild.googleapis.com
 
       - name: Build & Push Docker image
+        working-directory: ./backend
         run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_RUN_SERVICE }}
+          gcloud builds submit --tag gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.GCLOUD_RUN_SERVICE }} .
 
       - name: Deploy to Cloud Run
         run: |

@@ -6,15 +6,8 @@ export const uploadLogo = async (req: Request, res: Response) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
-  // Save the file to /assets or a public folder
-  const logoPath = path.join(__dirname, '../../../../assets/logo.png');
-  fs.rename(req.file.path, logoPath, (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Failed to save logo' });
-    }
-    return res.json({ url: '/assets/logo.png' });
-  });
+  // The file is already saved by multer middleware, so just return the path
+  return res.json({ url: `/assets/logo.png` });
 };
 
 export const getLogo = (req: Request, res: Response) => {

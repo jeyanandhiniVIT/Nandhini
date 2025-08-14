@@ -16,7 +16,6 @@ RUN cd backend && npm install
 
 # Copy backend code
 COPY backend ./backend
-COPY backend/.env ./backend/.env
 
 # Copy frontend build into backend
 COPY --from=builder /app/dist ./backend/dist/public

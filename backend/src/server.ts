@@ -54,6 +54,14 @@ app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+process.on('SIGINT', async () => {
+  await prisma.$disconnect();
+  server.close(() => {
+    console.log('Server has been gracefully terminated.');
+    process.exit(0);
+  });
 });
