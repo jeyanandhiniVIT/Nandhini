@@ -618,7 +618,7 @@ export const apiUploadLogo = async (logoBlob: Blob): Promise<{ url: string }> =>
   // This assumes your backend is running on the same origin or you have a proxy setup.
   // If your frontend and backend are on different ports during development (e.g., Vite on 5173, backend on 3000),
   // you need to configure a proxy in `vite.config.ts`.
-  const response = await fetch('/api/logo', {
+  const response = await fetch('https://my-backend-service-usrk.onrender.com/api/logo', {
     method: 'POST',
     body: formData,
     // Headers might be needed depending on your backend setup, e.g., for auth tokens.
@@ -637,7 +637,7 @@ export const apiUploadLogo = async (logoBlob: Blob): Promise<{ url: string }> =>
 };
 
 export const apiFetchLogo = async (): Promise<string> => {
-  const response = await fetch('/api/logo');
+  const response = await fetch('https://my-backend-service-usrk.onrender.com/api/logo');
   if (!response.ok) {
     throw new Error('Failed to fetch logo');
   }

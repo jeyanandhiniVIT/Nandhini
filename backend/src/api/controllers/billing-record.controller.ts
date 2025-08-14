@@ -18,6 +18,9 @@ export const createBillingRecord = async (req: Request, res: Response) => {
 
 export const getBillingRecords = async (req: Request, res: Response) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
         const userId = req.user.id;
         const billingRecords = await billingService.getBillingRecords(userId);
         res.status(200).json(billingRecords);

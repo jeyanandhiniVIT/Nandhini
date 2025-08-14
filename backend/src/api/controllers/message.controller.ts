@@ -6,6 +6,9 @@ import { createMessageSchema } from '../validators/message.validators';
 
 export const getMyMessages = async (req: Request, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
     const messages = await messageService.getMessagesForUser(req.user.id);
     res.status(200).json(messages);
   } catch (error) {
@@ -23,6 +26,9 @@ export const sendMessage = async (req: Request, res: Response) => {
   const { recipientId, content } = result.data;
 
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
     const newMessage = await messageService.createMessage({
       senderId: req.user.id,
       senderName: `${req.user.firstName} ${req.user.lastName}`,

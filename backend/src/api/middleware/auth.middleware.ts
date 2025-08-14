@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { AppError } from '../../utils/errorHandler';
+import { IUserPayload } from '../../types/express';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // Replace with your actual secret
 
@@ -16,20 +17,20 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
     if (err) {
       return next(new AppError('Invalid token', 403));
     }
-    req.user = user;
+    req.user = user as IUserPayload;
     next();
   });
 };
 
 export const authorizeAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user.role !== 'ADMIN') {
+  if (!req.user || req.user.role !== 'ADMIN') {
     return next(new AppError('Forbidden: Admins only', 403));
   }
   next();
 };
 
 export const authorizeOwnerOrAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user.id !== req.params.userId && req.user.role !== 'ADMIN') {
+  if (!req.user || (req.user.id !== req.params.userId && req.user.role !== 'ADMIN')) {
     return next(new AppError('Forbidden: You do not have permission to access this resource', 403));
   }
   next();

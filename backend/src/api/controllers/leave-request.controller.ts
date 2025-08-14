@@ -12,6 +12,9 @@ const leaveRequestSchema = z.object({
 
 export const createLeaveRequest = async (req: Request, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
     const validatedData = leaveRequestSchema.parse(req.body);
     const userId = req.user.id; // Assuming user ID is attached to req.user by auth middleware
     const leaveRequestData = {
@@ -33,6 +36,9 @@ export const createLeaveRequest = async (req: Request, res: Response) => {
 export const cancelLeaveRequest = async (req: Request, res: Response) => {
   const { requestId } = req.params;
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
     const leaveRequest = await leaveRequestService.cancelLeaveRequest(requestId, req.user.id);
     res.status(200).json(leaveRequest);
   } catch (error) {

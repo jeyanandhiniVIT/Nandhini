@@ -4,6 +4,9 @@ import * as attendanceService from '../services/attendance.service';
 export const AttendanceController = {
   clockIn: async (req: Request, res: Response) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
       const userId = req.user.id;
       const { date, clockInTime } = req.body;
       const attendanceRecord = await attendanceService.clockIn(userId, date, clockInTime);
@@ -15,6 +18,9 @@ export const AttendanceController = {
 
   clockOut: async (req: Request, res: Response) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
       const userId = req.user.id;
       const { date, clockOutTime } = req.body;
       const attendanceRecord = await attendanceService.clockOut(userId, date, clockOutTime);
@@ -26,6 +32,9 @@ export const AttendanceController = {
 
   getStatus: async (req: Request, res: Response) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
       const userId = req.user.id;
       const status = await attendanceService.getAttendanceStatus(userId);
       res.status(200).json(status);

@@ -3,6 +3,8 @@ import { Request } from 'express';
 interface IUserPayload {
   id: string;
   role: 'ADMIN' | 'EMPLOYEE';
+  firstName: string;
+  lastName: string;
 }
 
 declare global {

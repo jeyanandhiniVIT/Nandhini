@@ -5,6 +5,9 @@ import { createWorkReportSchema, updateWorkReportSchema } from '../validators/wo
 
 export const createWorkReport = async (req: Request, res: Response) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
         const validatedData = createWorkReportSchema.parse(req.body);
         const userId = req.user.id; // Assuming user ID is attached to req.user by auth middleware
         const report = await workReportService.createWorkReport(userId, validatedData);
@@ -19,6 +22,9 @@ export const createWorkReport = async (req: Request, res: Response) => {
 
 export const updateWorkReport = async (req: Request, res: Response) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
         const reportId = req.params.reportId;
         const validatedData = updateWorkReportSchema.parse(req.body);
         const updatedReport = await workReportService.updateWorkReport(req.user.id, reportId, validatedData);
@@ -56,6 +62,9 @@ export const deleteWorkReport = async (req: Request, res: Response) => {
 
 export const getWorkReportsByUser = async (req: Request, res: Response) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
         const userId = req.user.id;
         const reports = await workReportService.getReportsByUser(userId);
         res.status(200).json(reports);
