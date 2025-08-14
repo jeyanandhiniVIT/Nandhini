@@ -1,5 +1,5 @@
 {
-  "name": "EMS",
+  "name": "ems",
   "version": "1.0.0",
   "description": "A backend system for managing employees and billing records.",
   "main": "src/server.ts",
