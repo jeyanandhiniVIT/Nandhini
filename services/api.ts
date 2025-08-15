@@ -3,15 +3,32 @@ import { User, UserRole, AdminDashboardData, EmployeeDashboardData, StoredUser, 
 import { MOCK_API_DELAY } from '../constants';
 import { calculateDecimalHours, formatDate } from '../utils/dateUtils';
 
+// Basic hashing function (for demonstration purposes only)
+const hashPassword = (password: string): string => {
+  let hash = 0;
+  for (let i = 0; i < password.length; i++) {
+    const char = password.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+  }
+  return hash.toString();
+};
+
 // =====================================================================================
 // Mock Data Store
 // =====================================================================================
 
-let mockUserDatabase: StoredUser[] = [
-  { id: '1', username: 'admin', email: 'admin@example.com', role: UserRole.ADMIN, firstName: 'Admin', lastName: 'User', password_hash: 'admin123', department: 'Management', joinDate: '2020-01-01', profilePictureUrl: 'https://randomuser.me/api/portraits/men/1.jpg', phone: '111-222-3333' },
-  { id: '2', username: 'employee1', email: 'employee1@example.com', role: UserRole.EMPLOYEE, firstName: 'John', lastName: 'Doe', password_hash: 'emp123', department: 'Development', joinDate: '2021-06-15', profilePictureUrl: 'https://randomuser.me/api/portraits/men/2.jpg', phone: '444-555-6666' },
-  { id: '3', username: 'employee2', email: 'employee2@example.com', role: UserRole.EMPLOYEE, firstName: 'Jane', lastName: 'Smith', password_hash: 'emp123', department: 'Marketing', joinDate: '2022-03-10', profilePictureUrl: 'https://randomuser.me/api/portraits/women/2.jpg', phone: '777-888-9999' }
-];
+const localStorageKey = 'users';
+
+const getStoredUsers = (): StoredUser[] => {
+  const storedUsers = localStorage.getItem(localStorageKey);
+  return storedUsers ? JSON.parse(storedUsers) : [];
+};
+
+const setStoredUsers = (users: StoredUser[]) => {
+  localStorage.setItem(localStorageKey, JSON.stringify(users));
+};
+
+let mockUserDatabase: StoredUser[] = getStoredUsers();
 
 const mockProjects: Project[] = [
     {id: 'proj1', name: 'Website Redesign', billingType: 'hourly', ratePerHour: 75},
@@ -75,7 +92,7 @@ export const apiLogin = async (credentials: ParsedLoginCredentials): Promise<{ u
   await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY / 2));
 
   const foundUser = mockUserDatabase.find(
-    u => u.username === credentials.username && u.password_hash === credentials.password
+    u => u.username === credentials.username && hashPassword(credentials.password || '') === u.password_hash
   );
 
   if (foundUser) {
@@ -123,6 +140,7 @@ export const apiLogout = async (): Promise<void> => {
 export const apiFetchAllUsers = async (): Promise<User[]> => {
   console.warn("apiFetchAllUsers: Called with mock data store.");
   await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY));
+  mockUserDatabase = getStoredUsers();
   console.log("Mock DB: Fetching all users. Count:", mockUserDatabase.length);
   return Promise.resolve(mockUserDatabase.map(stripPassword));
 };
@@ -179,10 +197,10 @@ export const apiAdminCreateUser = async (userData: NewUser): Promise<User> => {
   console.warn("apiAdminCreateUser: Called with mock data store.");
   await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY));
 
-  if (mockUserDatabase.some(u => u.username === userData.username)) {
+  if (getStoredUsers().some(u => u.username === userData.username)) {
     return Promise.reject(new Error('Username already exists.'));
   }
-  if (mockUserDatabase.some(u => u.email === userData.email)) {
+  if (getStoredUsers().some(u => u.email === userData.email)) {
     return Promise.reject(new Error('Email already exists.'));
   }
 
@@ -190,7 +208,7 @@ export const apiAdminCreateUser = async (userData: NewUser): Promise<User> => {
     id: String(Date.now() + Math.random()),
     username: userData.username,
     email: userData.email,
-    password_hash: userData.password, // In a real app, this would be hashed on the backend
+    password_hash: hashPassword(userData.password), // Hash the password
     role: userData.role,
     firstName: userData.firstName,
     lastName: userData.lastName,
@@ -199,7 +217,10 @@ export const apiAdminCreateUser = async (userData: NewUser): Promise<User> => {
     joinDate: userData.joinDate || new Date().toISOString().split('T')[0],
     phone: userData.phone || '',
   };
-  mockUserDatabase.push(newUser);
+  const storedUsers = getStoredUsers();
+  storedUsers.push(newUser);
+  setStoredUsers(storedUsers);
+  mockUserDatabase = storedUsers;
   console.log("Mock DB: Admin created new user. Current DB size:", mockUserDatabase.length);
   return Promise.resolve(stripPassword(newUser));
 };

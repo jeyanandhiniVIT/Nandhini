@@ -76,6 +76,9 @@ const DashboardPage: React.FC = () => {
     if (path === '/admin/employees/add') {
       return <MainLayout><AddUser /></MainLayout>;
     }
+    if (path === '/admin/register') {
+      return <MainLayout><AddUser /></MainLayout>;
+    }
     if (path === '/admin/projects') {
       return <MainLayout><ManageProjects /></MainLayout>;
     }
