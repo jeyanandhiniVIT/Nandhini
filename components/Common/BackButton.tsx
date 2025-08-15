@@ -3,11 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { THEME } from '../../constants';
 
-const BackButton: React.FC = () => {
+interface BackButtonProps {
+  to?: string;
+}
+
+const BackButton: React.FC<BackButtonProps> = ({ to }) => {
   const navigate = useNavigate();
 
   const handleBack = () => {
-    navigate(-1);
+    if (to) {
+      navigate(to);
+    } else {
+      navigate(-1);
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
 
-import { User, UserRole, AdminDashboardData, EmployeeDashboardData, StoredUser, BillingRecord, BillingStatus, Project, DailyWorkReport, NewDailyWorkReportData, LeaveRequest, LeaveStatus, NewLeaveRequestData, EmployeeProfileUpdateData, AttendanceRecord, UserAttendanceStatus, AdminUserUpdateData, InternalMessage, WorkReportFilters, ChangePasswordData, ProjectLogItem } from '../types';
+import { User, UserRole, AdminDashboardData, EmployeeDashboardData, StoredUser, BillingRecord, BillingStatus, Project, DailyWorkReport, NewDailyWorkReportData, LeaveRequest, LeaveStatus, NewLeaveRequestData, EmployeeProfileUpdateData, AttendanceRecord, UserAttendanceStatus, AdminUserUpdateData, InternalMessage, WorkReportFilters, ChangePasswordData, ProjectLogItem, NewUser } from '../types';
 import { MOCK_API_DELAY } from '../constants';
 import { calculateDecimalHours, formatDate } from '../utils/dateUtils';
 
@@ -173,6 +173,35 @@ export const apiAdminUpdateUser = async (userId: string, updates: AdminUserUpdat
   mockUserDatabase[userIndex] = updatedStoredUser;
   console.log("Mock DB: Admin updated user", updatedStoredUser);
   return Promise.resolve(stripPassword(updatedStoredUser));
+};
+
+export const apiAdminCreateUser = async (userData: NewUser): Promise<User> => {
+  console.warn("apiAdminCreateUser: Called with mock data store.");
+  await new Promise(resolve => setTimeout(resolve, MOCK_API_DELAY));
+
+  if (mockUserDatabase.some(u => u.username === userData.username)) {
+    return Promise.reject(new Error('Username already exists.'));
+  }
+  if (mockUserDatabase.some(u => u.email === userData.email)) {
+    return Promise.reject(new Error('Email already exists.'));
+  }
+
+  const newUser: StoredUser = {
+    id: String(Date.now() + Math.random()),
+    username: userData.username,
+    email: userData.email,
+    password_hash: userData.password, // In a real app, this would be hashed on the backend
+    role: userData.role,
+    firstName: userData.firstName,
+    lastName: userData.lastName,
+    profilePictureUrl: userData.profilePictureUrl || null,
+    department: userData.department || 'Not Assigned',
+    joinDate: userData.joinDate || new Date().toISOString().split('T')[0],
+    phone: userData.phone || '',
+  };
+  mockUserDatabase.push(newUser);
+  console.log("Mock DB: Admin created new user. Current DB size:", mockUserDatabase.length);
+  return Promise.resolve(stripPassword(newUser));
 };
 
 export const apiDeleteUser = async (userIdToDelete: string, currentAdminUserId: string): Promise<void> => {

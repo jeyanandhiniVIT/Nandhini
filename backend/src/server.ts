@@ -26,6 +26,10 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('Hello from the root route!');
+});
+
 app.use('/assets', express.static(path.join(__dirname, '../../assets')));
 
 const authLimiter = rateLimit({
@@ -46,6 +50,10 @@ app.use('/dashboard', dashboardRoutes);
 app.use('/messages', messageRoutes);
 app.use('/ai', aiRoutes);
 app.use('/api', logoRoutes);
+
+app.get('/', (req, res) => {
+  res.send('Hello, world!');
+});
 
 app.use('/auth/login', authLimiter);
 app.use('/auth/register', authLimiter);

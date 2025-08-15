@@ -54,7 +54,6 @@ const Login: React.FC = () => {
               value={username}
               onChange={(e) => { setUsername(e.target.value); clearError(); }}
               className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-${THEME.secondary} focus:border-${THEME.secondary} sm:text-sm placeholder-gray-400`}
-              placeholder="admin or employee1"
             />
           </div>
 
@@ -71,7 +70,6 @@ const Login: React.FC = () => {
               value={password}
               onChange={(e) => { setPassword(e.target.value); clearError(); }}
               className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-${THEME.secondary} focus:border-${THEME.secondary} sm:text-sm placeholder-gray-400`}
-              placeholder="admin123 or emp123"
             />
           </div>
           
@@ -100,7 +98,6 @@ const Login: React.FC = () => {
       </div>
        <footer className="mt-8 text-center text-sm text-gray-500 z-10">
         <p>&copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.</p>
-        <p className="text-xs mt-1">Mock API. For demonstration purposes only.</p>
       </footer>
     </div>
   );

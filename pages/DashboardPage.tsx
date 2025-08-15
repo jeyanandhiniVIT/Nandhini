@@ -12,7 +12,7 @@ import ManageLeaveRequests from '../components/Admin/ManageLeaveRequests';
 import AdminSendNotification from '../components/Admin/AdminSendNotification'; 
 import ViewAttendanceReports from '../components/Admin/ViewAttendanceReports'; 
 import ViewWorkReports from '../components/Admin/ViewWorkReports'; 
-import Register from '../components/Register'; // Import Register component
+import AddUser from '../components/Admin/AddUser';
 
 
 import SubmitWorkReportForm from '../components/Employee/SubmitWorkReportForm';
@@ -73,8 +73,8 @@ const DashboardPage: React.FC = () => {
     if (path === '/admin/employees') {
       return <MainLayout><ManageEmployees /></MainLayout>;
     }
-    if (path === '/admin/register' || path === '/admin/employees/add') { // Support both routes for Add New User
-      return <MainLayout><Register /></MainLayout>;
+    if (path === '/admin/employees/add') {
+      return <MainLayout><AddUser /></MainLayout>;
     }
     if (path === '/admin/projects') {
       return <MainLayout><ManageProjects /></MainLayout>;

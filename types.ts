@@ -216,6 +216,11 @@ export type EmployeeProfileUpdateData = Pick<User, 'firstName' | 'lastName' | 'e
 // Admin updating user details
 export type AdminUserUpdateData = Pick<User, 'firstName' | 'lastName' | 'email' | 'phone' | 'department' | 'joinDate' | 'role' | 'profilePictureUrl'>;
 
+// Data for admin creating a new user
+export type NewUser = Omit<User, 'id'> & {
+  password: string;
+};
+
 // --- Password Change Type ---
 export interface ChangePasswordData {
   currentPassword?: string; // Optional for admin reset

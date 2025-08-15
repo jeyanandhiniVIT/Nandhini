@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { User, UserRole } from '../types';
-import { apiLogin, apiRegister, apiLogout, ParsedLoginCredentials, ParsedRegisterData, apiFetchUserById } from '../services/api'; 
+import { User } from '../types';
+import { apiLogin, apiRegister, apiLogout, ParsedLoginCredentials, ParsedRegisterData } from '../services/api'; 
 
 interface AuthContextType {
   user: User | null;
@@ -93,13 +93,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // apiRegister will now be an async call to your backend (or updated mock)
       await apiRegister(userData);
-      // The success alert (`User ${newUser.username} registered successfully! Please login.`)
-      // has been removed as it was suited for public registration.
-      // Admin registration success is handled in Register.tsx.
+      // After successful registration, automatically log in the user
+      await login({ username: userData.username, password: userData.password });
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
       // Important: Re-throw the error if Register.tsx needs to know about it to prevent navigation
-      throw err; 
+      throw err;
     } finally {
       setIsLoading(false);
     }
